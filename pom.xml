@@ -48,4 +48,49 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- 打包jar文件时，配置manifest文件，加入lib包的jar依赖 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <configuration>
+                        <classesDirectory>target/classes/</classesDirectory>
+                        <archive>
+                            <manifest>
+                                <!-- 主函数的入口 -->
+                                <mainClass>com.tonysfriend.ms.Start</mainClass>
+                                <!-- 打包时 MANIFEST.MF文件不记录的时间戳版本 -->
+                                <useUniqueVersions>false</useUniqueVersions>
+                                <addClasspath>true</addClasspath>
+                                <classpathPrefix>lib/</classpathPrefix>
+                            </manifest>
+                            <manifestEntries>
+                                <Class-Path>.</Class-Path>
+                            </manifestEntries>
+                        </archive>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    <!-- 配置部署的远程仓库 -->
+    <distributionManagement>
+        <!--<repository>-->
+        <!--<id>snapshots</id>-->
+        <!--<name>ngportal</name>-->
+        <!--<url>http://10.45.4.150:8081/nexus/content/repositories/snapshots/</url>-->
+        <!--</repository>-->
+        <repository>
+            <id>releases</id>
+            <name>Releases</name>
+            <url>http://115.28.85.213:28081/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>Snapshots</name>
+            <url>http://115.28.85.213:28081/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>

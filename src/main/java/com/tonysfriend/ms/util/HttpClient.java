@@ -3,7 +3,6 @@ package com.tonysfriend.ms.util;
 import com.tonysfriend.ms.bean.Result;
 import com.tonysfriend.ms.constant.Constants;
 import net.sf.json.JSONObject;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -38,6 +37,7 @@ public class HttpClient {
             return null;
         }
     };
+
     private static X509TrustManager[] xtmArray = new X509TrustManager[]{xtm};
     private static HttpsURLConnection conn = null;
 
@@ -83,8 +83,6 @@ public class HttpClient {
         if (conn != null)
             conn.disconnect();
     }
-
-
 
     /**
      * @return
