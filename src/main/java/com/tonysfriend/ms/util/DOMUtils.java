@@ -52,7 +52,7 @@ public class DOMUtils {
      * @return 返回文档对象
      * @throws DocumentException
      */
-    public static Document getXMLByString(String xmlstr) throws DocumentException {
+    public static Document getXMLByString(String xmlstr) throws Exception {
         if (xmlstr == "" || xmlstr == null) {
             return null;
         }

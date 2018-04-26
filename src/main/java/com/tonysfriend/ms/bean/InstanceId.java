@@ -43,9 +43,11 @@ import org.dom4j.Document;
  * @Author: tony.lu
  * @Date: 2018-04-23 上午 10:58
  */
-public class Instance {
+public class InstanceId {
 
-    String instanceId = "tonysfriends.lan:ribbon-consumer-1-2:5555";
+    String host;//"tonysfriends.lan:ribbon-consumer-1-2:5555";
+    int port;
+    String name;
 
     public static void setInstanceId(Document doc, String instanceId) {
         doc.getRootElement().element("instanceId").setText(instanceId);
@@ -58,7 +60,41 @@ public class Instance {
 
         if (StringUtil.isEmpty(ipAddr))
             ipAddr = localHostIp;
+
         doc.getRootElement().element("ipAddr").setText(ipAddr);
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "InstanceId{" +
+                "host='" + host + '\'' +
+                ", port=" + port +
+                ", name='" + name + '\'' +
+                '}';
     }
 
     public static void main(String[] args) throws Exception {
@@ -66,8 +102,8 @@ public class Instance {
         Document doc = DOMUtils.getXMLByString(Constants.REGISTER_XML_STRING);
         System.out.println(doc.getPath());
         System.out.println(doc.getRootElement().element("port").getText());
-        Instance.setInstanceId(doc, "tonysfriends.lan:ribbon-consumer-1-8:5555");
-        Instance.setIpAddr(doc, null);
+        InstanceId.setInstanceId(doc, "tonysfriends.lan:ribbon-consumer-1-8:5555");
+        InstanceId.setIpAddr(doc, null);
         System.out.println(DOMUtils.documentToString(doc, "UTF-8"));
 
     }

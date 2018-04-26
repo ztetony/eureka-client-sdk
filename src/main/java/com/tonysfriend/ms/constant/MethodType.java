@@ -7,7 +7,7 @@ public enum MethodType {
     CANCEL_DELETE("DELETE "),
     HB_PUT("PUT");
 
-    String name;
+    private String name;
 
     public String getName() {
         return name;
