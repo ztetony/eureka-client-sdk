@@ -53,13 +53,14 @@ public class InstanceId {
         doc.getRootElement().element("instanceId").setText(instanceId);
     }
 
-    public static void setIpAddr(Document doc, String ipAddr) {
+    public static void setIpAddr(Document doc, String ipAddr) throws Exception {
         //get cur ipAddr
 
-        String localHostIp = IpAddressUtil.getLocalHostAddress();
+        String localHostIp = IpAddressUtil.getLocalIp();
 
-        if (StringUtil.isEmpty(ipAddr))
+        if (StringUtil.isEmpty(ipAddr)) {
             ipAddr = localHostIp;
+        }
 
         doc.getRootElement().element("ipAddr").setText(ipAddr);
     }

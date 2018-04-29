@@ -27,7 +27,6 @@ public class RestTemplate<T> {
     }
 
     public Result<T> invokeForEntity(String url, String method, String contentType, Header header, Param param, int timeout) throws Exception {
-        ApplicationClientServiceImpl impl = new ApplicationClientServiceImpl();
         Result result = HttpClient.invoke(url, method, contentType, header, param, timeout);
 
         return result;

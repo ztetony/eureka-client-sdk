@@ -1,6 +1,9 @@
 package com.tonysfriend.ms.util;
 
+import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
 
 /**
  * @Author: tony.lu
@@ -23,6 +26,33 @@ public class IpAddressUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return hostAddress;
     }
+
+    public static final String getLocalIp() throws Exception {
+        String ipString = "";
+        Enumeration<NetworkInterface> allNetInterfaces = NetworkInterface.getNetworkInterfaces();
+        InetAddress ip = null;
+        while (allNetInterfaces.hasMoreElements()) {
+            NetworkInterface netInterface = (NetworkInterface) allNetInterfaces.nextElement();
+            Enumeration<InetAddress> addresses = netInterface.getInetAddresses();
+            while (addresses.hasMoreElements()) {
+                ip = (InetAddress) addresses.nextElement();
+                if (ip != null && ip instanceof Inet4Address && !ip.getHostAddress().equals("127.0.0.1")) {
+                    return ip.getHostAddress();
+                }
+            }
+        }
+        return ipString;
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        System.out.println(getLocalHostAddress());
+
+        System.out.println(getLocalIp());
+
+    }
+
 }

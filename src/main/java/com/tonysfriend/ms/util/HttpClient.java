@@ -105,6 +105,7 @@ public class HttpClient {
                                 String contentType,
                                 String params,
                                 int timeout) throws Exception {
+
         Result res = new Result();
         String result = "";
         HttpURLConnection connection = null;
@@ -112,31 +113,62 @@ public class HttpClient {
         try {
             InputStream is = null;
             OutputStream os = null;
-            URL url = new URL(urlstr);
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setConnectTimeout(timeout > 0 ? timeout : 10 * 1000);
-            connection.setReadTimeout(timeout > 0 ? timeout : 10 * 1000);
 
-            connection.setRequestMethod(method);
+            if ("POST".equals(method)) {
+                URL url = new URL(urlstr);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setConnectTimeout(timeout > 0 ? timeout : 10 * 1000);
+                connection.setReadTimeout(timeout > 0 ? timeout : 10 * 1000);
+
+                connection.setRequestMethod(method);
 //            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            connection.setRequestProperty("Content-Type", contentType);
-            connection.setDoOutput(true);
+                connection.setRequestProperty("User-Agent", "Mozilla/5.0 ( compatible ) ");
+                connection.setRequestProperty("Accept", "*/*");
+                connection.setRequestProperty("Content-Type", contentType);
+                connection.setUseCaches(false);
 
-            connection.connect();
-            os = connection.getOutputStream();
-            if (params != null) {
-                os.write(params.getBytes());
-                os.flush();
-                os.close();
-            }
-            //
-            is = connection.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            String line = br.readLine();
-//			line = new String(line.toString().getBytes("iso8859-1"), "utf-8");   
-            while (line != null) {
-                result = result + line;
-                line = br.readLine();
+                connection.setDoOutput(true);
+                connection.setDoInput(true);
+                connection.connect();
+                os = connection.getOutputStream();
+                if (params != null) {
+                    os.write(params.getBytes());
+                    os.flush();
+                    os.close();
+                }
+                //
+                is = connection.getInputStream();
+                BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                String line = br.readLine();
+//			line = new String(line.toString().getBytes("iso8859-1"), "utf-8");
+                while (line != null) {
+                    result = result + line;
+                    line = br.readLine();
+                }
+            } else {
+                URL url = new URL(urlstr + "?" + params);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setConnectTimeout(timeout > 0 ? timeout : 10 * 1000);
+                connection.setReadTimeout(timeout > 0 ? timeout : 10 * 1000);
+
+                connection.setRequestMethod(method);
+//            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                connection.setRequestProperty("User-Agent", "Mozilla/5.0 ( compatible ) ");
+                connection.setRequestProperty("Accept", "*/*");
+                connection.setRequestProperty("Content-Type", contentType);
+                connection.setUseCaches(false);
+
+                connection.setDoInput(true);
+                connection.connect();
+                //
+                is = connection.getInputStream();
+                BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                String line = br.readLine();
+//			line = new String(line.toString().getBytes("iso8859-1"), "utf-8");
+                while (line != null) {
+                    result = result + line;
+                    line = br.readLine();
+                }
             }
 
             int code = connection.getResponseCode();
@@ -157,6 +189,8 @@ public class HttpClient {
     }
 
     /**
+     * invoke
+     *
      * @param urlstr
      * @param method
      * @param contentType
@@ -177,20 +211,15 @@ public class HttpClient {
         String requestContent = "";
         String result = "";
         if ("application/json".equals(contentType)) {
-
             requestContent = JSON.toJSONString(params);
-
         } else if ("application/x-www-form-urlencoded".equals(contentType)) {
-
             StringBuilder sb = new StringBuilder();
             if (params != null && params.size() > 0) {
                 for (String p : params.keySet()) {
                     sb.append(p + "=" + params.get(p) + "&");
                 }
             }
-
             requestContent = sb.toString();
-
         } else {
             StringBuilder sb = new StringBuilder();
             if (params != null && params.size() > 0) {
@@ -198,57 +227,87 @@ public class HttpClient {
                     sb.append(p + "=" + params.get(p) + "&");
                 }
             }
-
             requestContent = sb.toString();
         }
-
+        //
         HttpURLConnection connection = null;
-
         try {
             InputStream is = null;
             OutputStream os = null;
-            URL url = new URL(urlstr);
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setConnectTimeout(timeout > 0 ? timeout : 10 * 1000);
-            connection.setReadTimeout(timeout > 0 ? timeout : 10 * 1000);
 
-            connection.setRequestMethod(method);
-//            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            if (headers != null && headers.size() > 0) {
-                for (String k : headers.keySet()) {
-                    connection.setRequestProperty(k, headers.get(k));
+
+            if ("POST".equals(method)) {
+                URL url = new URL(urlstr);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setConnectTimeout(timeout > 0 ? timeout : 10 * 1000);
+                connection.setReadTimeout(timeout > 0 ? timeout : 10 * 1000);
+                connection.setRequestMethod(method);
+                if (headers != null && headers.size() > 0) {
+                    for (String k : headers.keySet()) {
+                        connection.setRequestProperty(k, headers.get(k));
+                    }
                 }
+                connection.setRequestProperty("Content-Type", contentType);
+                connection.setUseCaches(false);
+                connection.setDoOutput(true);
+                connection.setDoInput(true);
+                connection.connect();
+                os = connection.getOutputStream();
+                if (requestContent != null) {
+                    os.write(requestContent.getBytes());
+                    os.flush();
+                    os.close();
+                }
+                //
+                is = connection.getInputStream();
+                BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                String line = br.readLine();
+                while (line != null) {
+                    result = result + line;
+                    line = br.readLine();
+                }
+            } else {
+                StringBuilder sb = new StringBuilder();
+                if (params != null && params.size() > 0) {
+                    for (String p : params.keySet()) {
+                        Object valObj = params.get(p);
+                        if(valObj instanceof Map) {
+                            sb.append(p + "=" + JSON.toJSONString(params.get(p)) + "&");
+                        }else if(valObj instanceof String){
+                            sb.append(p + "=" + params.get(p) + "&");
+                        }
+                    }//for
+                }//fi
+                requestContent = sb.toString();
+                URL url = new URL(urlstr + "?" + requestContent);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setConnectTimeout(timeout > 0 ? timeout : 10 * 1000);
+                connection.setReadTimeout(timeout > 0 ? timeout : 10 * 1000);
+                connection.setRequestMethod(method);
+                if (headers != null && headers.size() > 0) {
+                    for (String k : headers.keySet()) {
+                        connection.setRequestProperty(k, headers.get(k));
+                    }
+                }
+                connection.setRequestProperty("Content-Type", contentType);
+                connection.setUseCaches(false);
+                connection.setDoInput(true);
+                connection.connect();
+                //
+                is = connection.getInputStream();
+                BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                String line = br.readLine();
+                while (line != null) {
+                    result = result + line;
+                    line = br.readLine();
+                }//while
             }
 
-            connection.setRequestProperty("Content-Type", contentType);
-
-            connection.setDoOutput(true);
-            connection.setDoInput(true);
-            connection.connect();
-            os = connection.getOutputStream();
-            if (StringUtil.isNotEmpty("requestContent")) {
-                os.write(requestContent.getBytes());
-                os.flush();
-                os.close();
-            }
-
-            //
-            is = connection.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            String line = br.readLine();
-//			line = new String(line.toString().getBytes("iso8859-1"), "utf-8");
-            while (line != null) {
-                result = result + line;
-                line = br.readLine();
-            }
             int code = connection.getResponseCode();
             res.setCode(code);
-
         } catch (Exception e) {
-            e.printStackTrace();
             result = e.getMessage();
             res.setCode(Constants.CODE_SERVER_ERROR);
-
             throw new Exception(e);
         } finally {
             connection.disconnect();
@@ -256,17 +315,17 @@ public class HttpClient {
         }
 
         return res;
-
     }
 
     /**
+     * doGet
+     *
      * @param urlstr
-     * @param method
      * @param timeout
-     * @return
+     * @return Result
      * @throws Exception
      */
-    public static Result doGet(String urlstr, String method, int timeout) throws Exception {
+    public static Result doGet(String urlstr, int timeout) throws Exception {
         Result res = new Result();
         String result = "";
         HttpURLConnection connection = null;
@@ -277,7 +336,7 @@ public class HttpClient {
             connection = (HttpURLConnection) url.openConnection();
             connection.setConnectTimeout(timeout > 0 ? timeout : 10 * 1000);
             connection.setReadTimeout(timeout > 0 ? timeout : 10 * 1000);
-            connection.setRequestMethod(method);
+            connection.setRequestMethod("GET");
 //            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Mobile Safari/537.36");
             connection.setDoInput(true);
             connection.connect();
@@ -308,11 +367,16 @@ public class HttpClient {
 
     public static void main(String[] args) throws Exception {
         String url = "http://10.45.32.93:1111/eureka/apps/ZIOT.DMS.1.0.0.DAILY";
-        ;
-        Result result = doGet(url, "GET", 100 * 000);
+        url = "http://10.45.57.10:39000/testGetParam?p1=p5";
+        url = "http://localhost:9000/testhealth";
+        for(int i=0;i<55;i++){
+            Result result = invoke(url, "GET", "application/json", "{\"p1\":\"ppppp\"}", 100 * 000);
 
-        System.out.println(result.getCode());
-        System.out.println(result.getData());
+            System.out.println(result.getCode());
+            System.out.println(result.getData());
+            Thread.sleep(500);
+        }
+
 
     }
 
